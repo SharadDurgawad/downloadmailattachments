@@ -52,7 +52,9 @@ def downloadAttachments(imapSession, directoryPath, criteria, criteriaValue):
     #resp, items = imapSession.search(None, 'SENTSINCE', '{date}'.format(date=date))
     #resp, items = imapSession.search(None, 'SENTON', '{date}'.format(date=date))
 
-    resp, items = imapSession.search(None, criteria, criteriaValue)
+    # resp, items = imapSession.search(None, criteria, criteriaValue)
+
+    resp, items = imapSession.search(None, criteria, '{criteriaValue}'.format(criteriaValue=criteriaValue))
 
     items = items[0].split() # getting the mails id
 
@@ -129,8 +131,7 @@ def PrintOptions():
             3. on or after this Date
             4. on or before this Date
             5. On this Date
-            6. Between these two entered DATES
-            7. Exit  """)
+            6. Exit  """)
 
 
 def main():
@@ -142,32 +143,33 @@ def main():
         option = int(input("Enter the option from the list: "))
 
         if options.has_key(option):
-            # Call zipfolder function
+            # Get the attachments from a mail id
             if option == 1:
                 emailID = str(raw_input("Enter the valid email ID"))
                 options[option](serverConnection, downloadDirectory, 'FROM', emailID)
 
-            # Call extractArchiveFile function
+            # Get the attachments from mails matching the subject
             elif option == 2:
                 subjectString = str(raw_input("Enter the Subject string"))
                 options[option](serverConnection, downloadDirectory, 'SUBJECT', subjectString)
 
-            # Call listFilesFromArchive function
+            # Get the attachments on or after the date
             elif option == 3:
-                dateSentSince = str(input("Enter the Date, to get the attachments on or after that date in the format %d/%m/%Y"))
-                options[option](serverConnection, downloadDirectory, 'SENTSINCE', dateSentSince)
+                dateSentSince = str(raw_input("Enter the Date, to get the attachments on or after that date in the format %d/%m/%Y"))
+                date = datetime.strptime(str(dateSentSince), "%d/%m/%Y").strftime("%d-%b-%Y")
+                options[option](serverConnection, downloadDirectory, 'SENTSINCE', date)
 
-            # Call deleteFilesFromArchive function
+            # Get the attachments on or before the date
             elif option == 4:
-                dateSentBefore = str(input("Enter the Date, to get the attachments on or before that date, in the format %d/%m/%Y"))
-                options[option](serverConnection, downloadDirectory, 'SENTBEFORE', dateSentBefore)
+                dateSentBefore = str(raw_input("Enter the Date, to get the attachments on or before that date, in the format %d/%m/%Y"))
+                date = datetime.strptime(str(dateSentBefore), "%d/%m/%Y").strftime("%d-%b-%Y")
+                options[option](serverConnection, downloadDirectory, 'SENTBEFORE', date)
 
-            # Call deleteFilesFromArchive function
+            # Get the attachments on the date
             elif option == 5:
-                dateSentOn = str(input("Enter the Date, to get the attachments on that date, in the format %d/%m/%Y"))
+                dateSentOn = str(raw_input("Enter the Date, to get the attachments on that date, in the format %d/%m/%Y"))
                 date = datetime.strptime(str(dateSentOn), "%d/%m/%Y").strftime("%d-%b-%Y")
-                resp, items = imapSession.search(None, 'SENTON', '{date}'.format(date=date))
-                options[option](serverConnection, downloadDirectory, resp, items)
+                options[option](serverConnection, downloadDirectory, 'SENTON', date)
 
             # Call exitApp function
             elif option == 6 :
