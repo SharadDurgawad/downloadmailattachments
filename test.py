@@ -37,7 +37,14 @@ def open_connection(verbose=False):
     if verbose: print 'Logging in as', username
     connection.login(username, password)
 
-    downloadDirectory = connectionParams['downloadDirectory']
+    # Directory path to download the attachments
+    downloadDirectory = raw_input("Enter your valid directory path:")
+
+    # If the entered directory path does not exists then create the same
+    if not os.path.exists(downloadDirectory):
+        os.makedirs(downloadDirectory)
+
+    # downloadDirectory = connectionParams['downloadDirectory']
 
     return connection, downloadDirectory
 
@@ -145,29 +152,29 @@ def main():
         if options.has_key(option):
             # Get the attachments from a mail id
             if option == 1:
-                emailID = str(raw_input("Enter the valid email ID"))
+                emailID = str(raw_input("Enter the valid email ID: "))
                 options[option](serverConnection, downloadDirectory, 'FROM', emailID)
 
             # Get the attachments from mails matching the subject
             elif option == 2:
-                subjectString = str(raw_input("Enter the Subject string"))
+                subjectString = str(raw_input("Enter the Subject string: "))
                 options[option](serverConnection, downloadDirectory, 'SUBJECT', subjectString)
 
             # Get the attachments on or after the date
             elif option == 3:
-                dateSentSince = str(raw_input("Enter the Date, to get the attachments on or after that date in the format %d/%m/%Y"))
+                dateSentSince = str(raw_input("Enter the Date, to get the attachments on or after that date in the format dd/mm/yyyy: "))
                 date = datetime.strptime(str(dateSentSince), "%d/%m/%Y").strftime("%d-%b-%Y")
                 options[option](serverConnection, downloadDirectory, 'SENTSINCE', date)
 
             # Get the attachments on or before the date
             elif option == 4:
-                dateSentBefore = str(raw_input("Enter the Date, to get the attachments on or before that date, in the format %d/%m/%Y"))
+                dateSentBefore = str(raw_input("Enter the Date, to get the attachments on or before that date, in the format dd/mm/yyyy: "))
                 date = datetime.strptime(str(dateSentBefore), "%d/%m/%Y").strftime("%d-%b-%Y")
                 options[option](serverConnection, downloadDirectory, 'SENTBEFORE', date)
 
             # Get the attachments on the date
             elif option == 5:
-                dateSentOn = str(raw_input("Enter the Date, to get the attachments on that date, in the format %d/%m/%Y"))
+                dateSentOn = str(raw_input("Enter the Date, to get the attachments on that date, in the format dd/mm/yyyy: "))
                 date = datetime.strptime(str(dateSentOn), "%d/%m/%Y").strftime("%d-%b-%Y")
                 options[option](serverConnection, downloadDirectory, 'SENTON', date)
 
